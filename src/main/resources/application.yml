@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: atlas-api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: "OUJWeHM3OUJMPi80SzQ7O0tsQWFNZHtYOmopYWVJVFYK"
+
+
+  cloud:
+    gateway:
+      routes:
+        # Auth-Service (AuthenticationController @RequestMapping("/atlas/auth"))
+        - id: auth-service
+          uri: lb://ATLAS-AUTH-SERVICE
+          predicates:
+            - Path=/atlas/auth/**
+
+        # User-Service – AdminController @RequestMapping("/atlas/adm")
+        - id: admin-service
+          uri: lb://ATLAS-USER-SERVICE
+          predicates:
+            - Path=/atlas/adm/**
+
+        # User-Service – ProfessorController @RequestMapping("/atlas/professores")
+        - id: professor-service
+          uri: lb://ATLAS-USER-SERVICE
+          predicates:
+            - Path=/atlas/professores/**
+
+        # User-Service – InternalUserController @RequestMapping("/internal/users")
+        - id: internal-user-service
+          uri: lb://ATLAS-USER-SERVICE
+          predicates:
+            - Path=/internal/users/**
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.cloud.gateway.filter: TRACE
+
